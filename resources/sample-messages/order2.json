@@ -1,0 +1,48 @@
+{
+   "id": "22763874-baf0-45bb-a2aa-fbc7aa0671e1",
+   "status": 1,
+   "timestamp": "2019-06-24T19:47:58.240620198Z",
+   "user": {
+      "id": "da1d58fe-2524-4714-adbf-7caf2701d009"
+   },
+   "products": [
+      {
+         "id": "b5462a59-3342-4bad-bc86-ef03fd7976d5",
+         "description": "The Lord of the Rings",
+         "price": 22.99,
+         "attributes": [
+            {
+               "key": "category",
+               "value": "fiction"
+            },
+            {
+               "key": "author",
+               "value": "J. R. R. Tolkien"
+            },
+            {
+               "key": "isbn",
+               "value": "0-395-19395-8"
+            }            
+         ]
+      },
+      {
+         "id": "3c0e0906-b7fb-440d-aee2-9033cc94db9f",
+         "description": "Moby Dick",
+         "price": 8.99,
+         "attributes": [
+            {
+               "key": "category",
+               "value": "fiction"
+            },
+            {
+               "key": "author",
+               "value": "Herman Melville"
+            },
+            {
+               "key": "isbn",
+               "value": "0-553-21311-3"
+            }            
+         ]
+      }
+   ]
+}

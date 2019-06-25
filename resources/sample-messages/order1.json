@@ -1,0 +1,29 @@
+{
+   "id": "18ecdbc8-4a7f-4d7b-a913-4b90c9605840",
+   "status": 0,
+   "timestamp": "2019-06-23T11:12:00.246813997Z",
+   "user": {
+      "id": "23cbab50-3520-498e-b77a-4783f1c59a80"
+   },
+   "products": [
+      {
+         "id": "b5462a59-3342-4bad-bc86-ef03fd7976d5",
+         "description": "The Lord of the Rings",
+         "price": 22.99,
+         "attributes": [
+            {
+               "key": "category",
+               "value": "fiction"
+            },
+            {
+               "key": "author",
+               "value": "J. R. R. Tolkien"
+            },
+            {
+               "key": "isbn",
+               "value": "0-395-19395-8"
+            }            
+         ]
+      }
+   ]
+}
