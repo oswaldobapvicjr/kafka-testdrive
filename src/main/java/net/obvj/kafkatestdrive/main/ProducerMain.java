@@ -1,6 +1,7 @@
 package net.obvj.kafkatestdrive.main;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Properties;
 
@@ -13,7 +14,7 @@ import net.obvj.kafkatestdrive.producer.KafkaProducerService;
 
 public class ProducerMain
 {
-    public static void main(String[] args)
+    public static void main(String[] args) throws IOException
     {
         Configuration kafkaMessageSimulatorPropertiesReader = new Configuration(Mode.PRODUCER);
 
@@ -23,7 +24,7 @@ public class ProducerMain
         try (Producer<String, String> producer = kafkaMessageProducer.createProducer())
         {
             KafkaProducerService kafkaProducerService = new KafkaProducerService(producer, propertyFile);
-            Path jsonFilesPath = new File(kafkaMessageSimulatorPropertiesReader.getJsonFilesPath()).toPath();
+            Path jsonFilesPath = new File(kafkaMessageSimulatorPropertiesReader.getProducerInputPath()).toPath();
             kafkaProducerService.consumeJsonFromDirectoryPath(jsonFilesPath);
             kafkaProducerService.watchJsonDirectoryPath(jsonFilesPath);
         }

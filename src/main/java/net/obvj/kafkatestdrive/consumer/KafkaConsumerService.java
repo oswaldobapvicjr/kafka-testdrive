@@ -68,7 +68,8 @@ public class KafkaConsumerService
             }
             catch (InterruptedException exception)
             {
-                log.log(Level.WARNING, "Interrupted while sleeping. Restoring interrupted state...", exception);
+                log.log(Level.WARNING, "Interrupted", exception);
+                Thread.currentThread().interrupt();
             }
         }
     }

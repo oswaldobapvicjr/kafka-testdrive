@@ -42,8 +42,8 @@ public class Configuration
     /*
      * Resources directories
      */
-    public static final String PRODUCER_INPUT_FILES = "producer-input";
-    public static final String RESOURCE_DIRECTORY = "resources/";
+    public static final String PRODUCER_INPUT_DIR = "producer-input";
+    public static final String RESOURCES_DIR = "resources/";
 
     /*
      * Configuration files
@@ -146,13 +146,11 @@ public class Configuration
     }
 
     /**
-     * This method return the path where input-files are placed.
-     *
-     * @return path for input files
+     * @return the path where input-files are read from
      */
-    public String getJsonFilesPath()
+    public String getProducerInputPath()
     {
-        return getPropertiesFile().getAbsolutePath().replaceAll(mode.getFileName(), PRODUCER_INPUT_FILES);
+        return "./" + RESOURCES_DIR + "/" + PRODUCER_INPUT_DIR;
     }
 
     private Properties fillProperties(InputStream pInput, Properties pDefaultProperties) throws IOException
@@ -184,7 +182,7 @@ public class Configuration
     {
         File configFile = null;
         String baseDir = "./";
-        configFile = new File(baseDir, RESOURCE_DIRECTORY + mode.fileName);
+        configFile = new File(baseDir, RESOURCES_DIR + mode.fileName);
         log.info("settings=" + configFile.getAbsolutePath());
         return configFile;
     }
