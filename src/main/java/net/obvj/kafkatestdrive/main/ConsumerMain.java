@@ -21,7 +21,7 @@ public class ConsumerMain
         try (Consumer<String, String> consumer = kafkaMessageConsumer.createConsumer())
         {
             KafkaConsumerService kafkaConsumerService = new KafkaConsumerService(consumer, properties);
-            kafkaConsumerService.consumeMessageFromKafkaTopic();
+            kafkaConsumerService.start();
         }
     }
 }

@@ -138,9 +138,9 @@ public class Configuration
             properties = mode.getDefaultProperties();
         }
 
-        for (Entry<Object, Object> returnedProperty : properties.entrySet())
+        for (Entry<Object, Object> property : properties.entrySet())
         {
-            log.log(Level.INFO, "{0}: {1}", new Object[] { returnedProperty.getKey(), returnedProperty.getValue() });
+            log.log(Level.INFO, "{0}: {1}", new Object[] { property.getKey(), property.getValue() });
         }
         return properties;
     }

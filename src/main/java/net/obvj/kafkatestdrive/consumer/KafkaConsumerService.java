@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,6 +23,8 @@ public class KafkaConsumerService
 
     private Consumer<String, String> consumer;
     private Properties properties;
+    
+    private boolean running;
 
     /**
      * KafkaProducerService constructor
@@ -37,41 +38,11 @@ public class KafkaConsumerService
         this.properties = properties;
     }
 
-    public void consumeMessageFromKafkaTopic()
+    public void start()
     {
+        running = true;
         subscribe();
         readMessages();
-    }
-
-    /**
-     * This method consume messages from Kafka topic and log them.
-     */
-    public void readMessages()
-    {
-        while (true)
-        {
-            try
-            {
-                final ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofSeconds(1));
-                if (consumerRecords.isEmpty())
-                {
-                    TimeUnit.SECONDS.sleep(5);
-                    continue;
-                }
-
-                for (ConsumerRecord<String, String> record : consumerRecords)
-                {
-                    logRecordInfo(record);
-                }
-                consumer.commitSync();
-
-            }
-            catch (InterruptedException exception)
-            {
-                log.log(Level.WARNING, "Interrupted", exception);
-                Thread.currentThread().interrupt();
-            }
-        }
     }
 
     private void subscribe()
@@ -79,23 +50,40 @@ public class KafkaConsumerService
         try
         {
             List<String> topics = Collections.singletonList(properties.getProperty(Configuration.PROPERTY_TOPIC));
-            log.info("Kafka consumer started! topic = " + topics.toString());
 
-            log.info("Consumer subscribe start.");
+            log.log(Level.INFO, "Subscribing to topic {0}...", topics);
             consumer.subscribe(topics);
-            log.info("Consumer subscribe done.");
+            log.info("Consumer subscription complete.");
 
         }
         catch (IllegalArgumentException | IllegalStateException exception)
         {
-            log.log(Level.SEVERE, "Consumer subscribe failed.", exception);
+            log.log(Level.SEVERE, "Consumer subscription failed.", exception);
+        }
+    }
+    
+    /**
+     * This method consume messages from Kafka topic and log them.
+     */
+    public void readMessages()
+    {
+        while (running)
+        {
+            log.info("Polling...");
+            ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofSeconds(5));
+            if (!consumerRecords.isEmpty())
+            {
+                consumerRecords.forEach(this::logRecordInfo);
+                consumer.commitSync();
+            }
         }
     }
 
     private void logRecordInfo(ConsumerRecord<String, String> record)
     {
-        log.info("Message received from topic: " + record.topic() + " partition: " + record.partition());
-        log.info("Record key: " + record.key());
-        log.info("Record value: " + record.value());
+        log.log(Level.INFO, "Message received from topic {0}, partition {1}",
+                new Object[] { record.topic(), record.partition() });
+        log.log(Level.INFO, "Record key: {0}", record.key());
+        log.log(Level.INFO, "Record value: {0}", record.value());
     }
 }
