@@ -11,11 +11,23 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.producer.ProducerConfig;
+
 public class Configuration
 {
     public enum Mode
     {
+        /**
+         * Watches a folder in the file system and produces new messages with each file's content
+         * onto a Kafka topic
+         */
         PRODUCER(PRODUCER_PROPERTIES, defaultProducerProperties()),
+
+        /**
+         * Subscribes to a Kafka topic and appends the content of each message to the console
+         */
         CONSUMER(CONSUMER_PROPERTIES, defaultConsumerProperties());
 
         final String fileName;
@@ -36,7 +48,6 @@ public class Configuration
         {
             return defaultProperties;
         }
-
     }
 
     /*
@@ -51,18 +62,27 @@ public class Configuration
     public static final String PRODUCER_PROPERTIES = "producer.properties";
     public static final String CONSUMER_PROPERTIES = "consumer.properties";
 
-    public static final String PROPERTY_BOOTSTRAP_SERVERS_CONFIG = "BOOTSTRAP_SERVERS_CONFIG";
-    public static final String PROPERTY_TOPIC = "TOPIC";
-    public static final String PROPERTY_CLIENT_ID_CONFIG = "CLIENT_ID_CONFIG";
-    public static final String PROPERTY_KEY_SERIALIZER_CLASS_CONFIG = "KEY_SERIALIZER_CLASS_CONFIG";
-    public static final String PROPERTY_VALUE_SERIALIZER_CLASS_CONFIG = "VALUE_SERIALIZER_CLASS_CONFIG";
-    public static final String PROPERTY_GROUP_ID_CONFIG = "GROUP_ID_CONFIG";
-    public static final String PROPERTY_MAX_POLL_RECORDS_CONFIG = "MAX_POLL_RECORDS_CONFIG";
-    public static final String PROPERTY_KEY_DESERIALIZER_CLASS_CONFIG = "KEY_DESERIALIZER_CLASS_CONFIG";
-    public static final String PROPERTY_VALUE_DESERIALIZER_CLASS_CONFIG = "VALUE_DESERIALIZER_CLASS_CONFIG";
-    public static final String PROPERTY_ENABLE_AUTO_COMMIT_CONFIG = "ENABLE_AUTO_COMMIT_CONFIG";
-    public static final String PROPERTY_MAX_MESSAGE_FILES_BACKUP_INDEX = "MAX_MESSAGE_FILES_BACKUP_INDEX";
-    public static final String PROPERTY_OUTPUT_MESSAGE_JSON_PATH = "OUTPUT_MESSAGE_JSON_PATH";
+    /*
+     * Common Kafka properties
+     */
+    public static final String TOPIC_NAME = "topic.name";
+    public static final String BOOTSTRAP_SERVERS = CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG;
+    public static final String CLIENT_ID = CommonClientConfigs.CLIENT_ID_CONFIG;
+
+    /*
+     * Producer properties
+     */
+    public static final String KEY_SERIALIZER_CLASS = ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG;
+    public static final String VALUE_SERIALIZER_CLASS = ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG;
+
+    /*
+     * Consumer properties
+     */
+    public static final String KEY_DESERIALIZER_CLASS = ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG;
+    public static final String VALUE_DESERIALIZER_CLASS = ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG;
+    public static final String GROUP_ID = ConsumerConfig.GROUP_ID_CONFIG;
+    public static final String MAX_POLL_RECORDS = ConsumerConfig.MAX_POLL_RECORDS_CONFIG;
+    public static final String ENABLE_AUTO_COMMIT = ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG;
 
     /**
      * Pattern to match environment variables in format ${VAR_NAME}
@@ -72,17 +92,17 @@ public class Configuration
     /*
      * Default properties
      */
-    private static final String BOOTSTRAP_SERVERS_CONFIG = "localhost:9092";
-    private static final String KEY_SERIALIZER_CLASS_CONFIG = "org.apache.kafka.common.serialization.StringSerializer";
-    private static final String VALUE_SERIALIZER_CLASS_CONFIG = "org.apache.kafka.common.serialization.ByteArraySerializer";
-    private static final String KEY_DESERIALIZER_CLASS_CONFIG = "org.apache.kafka.common.serialization.StringDeserializer";
-    private static final String VALUE_DESERIALIZER_CLASS_CONFIG = "org.apache.kafka.common.serialization.ByteArrayDeserializer";
-    private static final String CLIENT_ID_CONFIG = "defaultClient";
-    private static final String PRODUCER_TOPIC = "testTopic1";
-    private static final String CONSUMER_TOPIC = "testTopic1";
-    private static final String GROUP_ID_CONFIG = "defaultGroup";
-    private static final String MAX_POLL_RECORDS_CONFIG = "1";
-    private static final String ENABLE_AUTO_COMMIT_CONFIG = "false";
+    private static final String DEFAULT_BOOTSTRAP_SERVERS_CONFIG = "localhost:9092";
+    private static final String DEFAULT_KEY_SERIALIZER_CLASS_CONFIG = "org.apache.kafka.common.serialization.StringSerializer";
+    private static final String DEFAULT_VALUE_SERIALIZER_CLASS_CONFIG = "org.apache.kafka.common.serialization.ByteArraySerializer";
+    private static final String DEFAULT_KEY_DESERIALIZER_CLASS_CONFIG = "org.apache.kafka.common.serialization.StringDeserializer";
+    private static final String DEFAULT_VALUE_DESERIALIZER_CLASS_CONFIG = "org.apache.kafka.common.serialization.ByteArrayDeserializer";
+    private static final String DEFAULT_CLIENT_ID_CONFIG = "defaultClient";
+    private static final String DEFAULT_GROUP_ID_CONFIG = "defaultGroup";
+    private static final String DEFAULT_MAX_POLL_RECORDS_CONFIG = "1";
+    private static final String DEFAULT_ENABLE_AUTO_COMMIT_CONFIG = "false";
+    private static final String DEFAULT_PRODUCER_TOPIC = "testTopic1";
+    private static final String DEFAULT_CONSUMER_TOPIC = "testTopic1";
 
     private final Logger log = Logger.getLogger(Configuration.class.getName());
 
@@ -96,25 +116,25 @@ public class Configuration
     private static Properties defaultProducerProperties()
     {
         Properties properties = new Properties();
-        properties.put(PROPERTY_BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS_CONFIG);
-        properties.put(PROPERTY_CLIENT_ID_CONFIG, CLIENT_ID_CONFIG);
-        properties.put(PROPERTY_KEY_SERIALIZER_CLASS_CONFIG, KEY_SERIALIZER_CLASS_CONFIG);
-        properties.put(PROPERTY_VALUE_SERIALIZER_CLASS_CONFIG, VALUE_SERIALIZER_CLASS_CONFIG);
-        properties.put(PROPERTY_TOPIC, PRODUCER_TOPIC);
+        properties.put(BOOTSTRAP_SERVERS, DEFAULT_BOOTSTRAP_SERVERS_CONFIG);
+        properties.put(CLIENT_ID, DEFAULT_CLIENT_ID_CONFIG);
+        properties.put(KEY_SERIALIZER_CLASS, DEFAULT_KEY_SERIALIZER_CLASS_CONFIG);
+        properties.put(VALUE_SERIALIZER_CLASS, DEFAULT_VALUE_SERIALIZER_CLASS_CONFIG);
+        properties.put(TOPIC_NAME, DEFAULT_PRODUCER_TOPIC);
         return properties;
     }
 
     private static Properties defaultConsumerProperties()
     {
         Properties properties = new Properties();
-        properties.put(PROPERTY_BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS_CONFIG);
-        properties.put(PROPERTY_CLIENT_ID_CONFIG, CLIENT_ID_CONFIG);
-        properties.put(PROPERTY_KEY_DESERIALIZER_CLASS_CONFIG, KEY_DESERIALIZER_CLASS_CONFIG);
-        properties.put(PROPERTY_VALUE_DESERIALIZER_CLASS_CONFIG, VALUE_DESERIALIZER_CLASS_CONFIG);
-        properties.put(PROPERTY_GROUP_ID_CONFIG, GROUP_ID_CONFIG);
-        properties.put(PROPERTY_TOPIC, CONSUMER_TOPIC);
-        properties.put(PROPERTY_MAX_POLL_RECORDS_CONFIG, MAX_POLL_RECORDS_CONFIG);
-        properties.put(PROPERTY_ENABLE_AUTO_COMMIT_CONFIG, ENABLE_AUTO_COMMIT_CONFIG);
+        properties.put(BOOTSTRAP_SERVERS, DEFAULT_BOOTSTRAP_SERVERS_CONFIG);
+        properties.put(CLIENT_ID, DEFAULT_CLIENT_ID_CONFIG);
+        properties.put(KEY_DESERIALIZER_CLASS, DEFAULT_KEY_DESERIALIZER_CLASS_CONFIG);
+        properties.put(VALUE_DESERIALIZER_CLASS, DEFAULT_VALUE_DESERIALIZER_CLASS_CONFIG);
+        properties.put(GROUP_ID, DEFAULT_GROUP_ID_CONFIG);
+        properties.put(TOPIC_NAME, DEFAULT_CONSUMER_TOPIC);
+        properties.put(MAX_POLL_RECORDS, DEFAULT_MAX_POLL_RECORDS_CONFIG);
+        properties.put(ENABLE_AUTO_COMMIT, DEFAULT_ENABLE_AUTO_COMMIT_CONFIG);
         return properties;
     }
 
@@ -123,7 +143,7 @@ public class Configuration
      *
      * @return propertiesMap
      */
-    public Properties readFileProperties()
+    public Properties loadPropertiesFile()
     {
         Properties properties;
         File baseDirectoryFile = getPropertiesFile();

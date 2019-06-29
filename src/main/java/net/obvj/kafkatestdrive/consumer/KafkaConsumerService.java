@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 
 import net.obvj.kafkatestdrive.config.Configuration;
 
@@ -32,10 +33,10 @@ public class KafkaConsumerService
      * @param consumer
      * @param properties
      */
-    public KafkaConsumerService(Consumer<String, String> consumer, Properties properties)
+    public KafkaConsumerService(Properties properties)
     {
-        this.consumer = consumer;
         this.properties = properties;
+        this.consumer = new KafkaConsumer<>(properties);
     }
 
     public void start()
@@ -49,7 +50,7 @@ public class KafkaConsumerService
     {
         try
         {
-            List<String> topics = Collections.singletonList(properties.getProperty(Configuration.PROPERTY_TOPIC));
+            List<String> topics = Collections.singletonList(properties.getProperty(Configuration.TOPIC_NAME));
 
             log.log(Level.INFO, "Subscribing to topic {0}...", topics);
             consumer.subscribe(topics);

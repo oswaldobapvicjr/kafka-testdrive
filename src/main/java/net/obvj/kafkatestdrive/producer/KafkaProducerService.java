@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
@@ -37,10 +38,10 @@ public class KafkaProducerService
      * @param producer
      * @param propertyFile
      */
-    public KafkaProducerService(Producer<String, String> producer, Properties propertyFile)
+    public KafkaProducerService(Properties propertyFile)
     {
-        this.producer = producer;
         this.properties = propertyFile;
+        this.producer = new KafkaProducer<>(properties);
     }
 
     /**
@@ -142,7 +143,7 @@ public class KafkaProducerService
 
     private void sendMessage(JSONObject jsonObject)
     {
-        String topicName = properties.getProperty(Configuration.PROPERTY_TOPIC);
+        String topicName = properties.getProperty(Configuration.TOPIC_NAME);
 
         log.finest(jsonObject.toString());
         try
