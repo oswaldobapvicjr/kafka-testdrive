@@ -71,7 +71,7 @@ public class KafkaProducerService
         try (FileSystem fs = path.getFileSystem(); WatchService service = fs.newWatchService())
         {
             path.register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE);
-            log.info("Watching path: " + path);
+            log.log(Level.INFO, "Watching path: {0}", path);
             watch(service);
         }
         catch (IOException ioe)
@@ -93,7 +93,7 @@ public class KafkaProducerService
                     {
                         Path newPath = ((Path) key.watchable()).resolve(((WatchEvent<Path>) watchEvent).context());
 
-                        log.info("New file found: " + newPath);
+                        log.log(Level.INFO, "New file found: {0}", newPath);
                         runProducer(newPath);
                         deleteFile(newPath);
                     }
@@ -105,7 +105,7 @@ public class KafkaProducerService
             }
             catch (InterruptedException iex)
             {
-                log.log(Level.WARNING, "Interrupted", iex);
+                log.log(Level.WARNING, "Interrupted while waiting for files.", iex);
                 Thread.currentThread().interrupt();
             }
         }
@@ -119,7 +119,7 @@ public class KafkaProducerService
         }
         catch (InterruptedException iex)
         {
-            log.log(Level.WARNING, "Interrupted", iex);
+            log.log(Level.WARNING, "Interrupted while waiting", iex);
             Thread.currentThread().interrupt();
         }
 
@@ -145,7 +145,7 @@ public class KafkaProducerService
     {
         String topicName = properties.getProperty(Configuration.TOPIC_NAME);
 
-        log.finest(jsonObject.toString());
+        log.log(Level.FINEST, "JSON: {0}", jsonObject);
         try
         {
             ProducerRecord<String, String> record;
@@ -155,27 +155,31 @@ public class KafkaProducerService
                     + Integer.valueOf(metadata.partition()) + " " + "offset = " + Long.valueOf(metadata.offset())
                     + ")");
         }
-        catch (InterruptedException | ExecutionException e)
+        catch (InterruptedException e)
         {
-            log.log(Level.WARNING, "Error when sending a message to kafka topic. The message will not be sent.", e);
+            log.log(Level.WARNING, "Interrupted while sending message.", e);
+            Thread.currentThread().interrupt();
+        }
+        catch (ExecutionException e)
+        {
+            log.log(Level.WARNING, "Error when sending a message to kafka topic.", e);
         }
     }
 
-    private void deleteFile(Path filePath) throws IOException
+    private void deleteFile(Path path) throws IOException
     {
-        Files.delete(filePath);
-        log.info("File deleted: " + filePath);
+        Files.delete(path);
+        log.log(Level.INFO, "File deleted: {0}", path);
     }
 
-    private File[] getFileList(Path ath)
+    private File[] getFileList(Path path)
     {
-        File directory = new File(ath.toString());
+        File directory = new File(path.toString());
         return directory.listFiles((dir, name) -> name.endsWith(JSON));
     }
 
     private String readFile(String filename)
     {
-        String result = "";
         try (BufferedReader br = new BufferedReader(new FileReader(filename)))
         {
             StringBuilder sb = new StringBuilder();
@@ -185,12 +189,12 @@ public class KafkaProducerService
                 sb.append(line);
                 line = br.readLine();
             }
-            result = sb.toString();
+            return sb.toString();
         }
         catch (Exception e)
         {
-            log.log(Level.WARNING, "Error reading file name: " + filename, e);
+            log.log(Level.WARNING, "Error reading file: " + filename, e);
+            return null;
         }
-        return result;
     }
 }
