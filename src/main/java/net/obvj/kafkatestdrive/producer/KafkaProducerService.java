@@ -20,8 +20,7 @@ import org.codehaus.jettison.json.JSONObject;
 import net.obvj.kafkatestdrive.config.Configuration;
 
 /**
- * This class is responsible for sending messages to a kafka topic configured via
- * properties files
+ * This class is responsible for sending messages to a Kafka topic
  */
 public class KafkaProducerService
 {
@@ -48,14 +47,14 @@ public class KafkaProducerService
      * This method consumes .json files from specific path
      *
      * @param path
-     * @throws IOException 
+     * @throws IOException
      */
-    public void consumeJsonFromDirectoryPath(Path path) throws IOException
+    public void consumeJsonFromPath(Path path) throws IOException
     {
         File[] fileList = getFileList(path);
         for (File file : fileList)
         {
-            log.info("Consuming : " + file.getName());
+            log.info("Reading file: " + file.getName());
             runProducer(file.toPath());
             deleteFile(file.toPath());
         }
@@ -111,7 +110,7 @@ public class KafkaProducerService
         }
     }
 
-    private void runProducer(Path newPath)
+    private void runProducer(Path path)
     {
         try
         {
@@ -123,21 +122,21 @@ public class KafkaProducerService
             Thread.currentThread().interrupt();
         }
 
-        File jsonFile = newPath.toFile();
+        File jsonFile = path.toFile();
         if (!jsonFile.exists())
         {
-            log.warning("Json file not found! Do nothing.");
+            log.warning("Input file not found.");
             return;
         }
         try
         {
-            String jsonString = readFile(newPath.toAbsolutePath().toString());
+            String jsonString = readFile(path.toAbsolutePath().toString());
             JSONObject jsonObject = new JSONObject(jsonString);
             sendMessage(jsonObject);
         }
         catch (Exception exception)
         {
-            log.log(Level.WARNING, "Error when reading .json file.", exception);
+            log.log(Level.WARNING, "Error reading file", exception);
         }
     }
 
@@ -148,21 +147,19 @@ public class KafkaProducerService
         log.log(Level.FINEST, "JSON: {0}", jsonObject);
         try
         {
-            ProducerRecord<String, String> record;
-            record = new ProducerRecord<>(topicName, jsonObject.toString());
+            ProducerRecord<String, String> record = new ProducerRecord<>(topicName, jsonObject.toString());
             RecordMetadata metadata = producer.send(record).get();
-            log.info("sent record(key = " + record.key() + " value = " + record.value() + "] " + "meta(partition = "
-                    + Integer.valueOf(metadata.partition()) + " " + "offset = " + Long.valueOf(metadata.offset())
-                    + ")");
+            log.log(Level.INFO, "Sent record [key = {0}, value = {1}, meta (patition = {2}, offset = {3})]",
+                    new Object[] { record.key(), record.value(), metadata.partition(), metadata.offset() });
         }
         catch (InterruptedException e)
         {
-            log.log(Level.WARNING, "Interrupted while sending message.", e);
+            log.log(Level.WARNING, "Interrupted while sending message", e);
             Thread.currentThread().interrupt();
         }
         catch (ExecutionException e)
         {
-            log.log(Level.WARNING, "Error when sending a message to kafka topic.", e);
+            log.log(Level.WARNING, "Error sending message to kafka topic", e);
         }
     }
 

@@ -21,7 +21,7 @@ public class ProducerMain
         Path jsonFilesPath = new File(configuration.getProducerInputPath()).toPath();
 
         // First read all files from the source directory
-        producer.consumeJsonFromDirectoryPath(jsonFilesPath);
+        producer.consumeJsonFromPath(jsonFilesPath);
         
         // Then start watching new files
         producer.watchJsonDirectoryPath(jsonFilesPath);

@@ -15,8 +15,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import net.obvj.kafkatestdrive.config.Configuration;
 
 /**
- * This class is responsible to retrieve messages from a Kafka Topic configured via
- * properties file.
+ * This class is responsible to consume messages from a Kafka Topic
  */
 public class KafkaConsumerService
 {
@@ -64,7 +63,7 @@ public class KafkaConsumerService
     }
     
     /**
-     * This method consume messages from Kafka topic and log them.
+     * This method consumes messages from Kafka
      */
     public void readMessages()
     {
@@ -86,5 +85,6 @@ public class KafkaConsumerService
                 new Object[] { record.topic(), record.partition() });
         log.log(Level.INFO, "Record key: {0}", record.key());
         log.log(Level.INFO, "Record value: {0}", record.value());
+        log.log(Level.INFO, "Record offset: {0}", record.offset());
     }
 }
