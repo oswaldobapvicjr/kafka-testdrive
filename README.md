@@ -4,7 +4,7 @@
 
 A test-drive project using [Apache Kafka](https://kafka.apache.org/) for message handling.
 
-> **Disclaimer**: This is just a samples project. The source code herein is not necessarily production-ready.
+> ❕ **Disclaimer**: This is a sample project, published for knowledge sharing. The source code is not necessarily production-ready.
 
 ---
 
